@@ -23,3 +23,7 @@ Show standard library only
 python iSee.py -p https://github.com/pandas-dev/pandas.git ./libs/numpy -s
 ``` 
 
+Limit the number of library show
+```
+python iSee.py -p https://github.com/pandas-dev/pandas.git ./libs/numpy -s -n 20
+```

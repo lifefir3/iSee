@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "isee"
-version = "0.1.1"
+version = "0.1.2"
 description = "List import statements from all commits"
 authors = ["Samuel Ky Lau <samuel.ky@gmail.com>"]
 license = "GPL-3.0"

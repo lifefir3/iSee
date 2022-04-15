@@ -56,17 +56,24 @@ def count_import_statements(py_libs: list) -> list:
                     if "import " in line:
                         data = line.lstrip()
                         # read ahead for mulit-line import
-                        if "(" in data:
+                        if "(" in data or "\\" in data:
                             # print(data)
                             while True:
                                 next_line = next(source_file, None)
                                 data += next_line
-                                if ")" in data:
+                                if ")" in data or "\\" not in next_line:
                                     break
                         """
                         clean import statement
                         """
-                        data = data.replace("\n", "").replace(",", "").replace("(", "").replace(")", "").split()
+                        data = (
+                            data.replace("\n", "")
+                            .replace(",", "")
+                            .replace("(", "")
+                            .replace(")", "")
+                            .replace("\\", "")
+                            .split()
+                        )
                         if "as" in data:
                             index = data.index("as")
                             data = data[:index]
@@ -78,16 +85,24 @@ def count_import_statements(py_libs: list) -> list:
                         data = ['from', 'django.contrib.admin.models', 'import', 'ADDITION,', 'CHANGE,', 'DELETION,', 'LogEntry']
                         py_lib = {'key': [number_of_imports, child{key:number_of_imports}]}
                         """
-                        if data[MODULE_NAME] in py_libs.keys():
-                            py_libs[data[MODULE_NAME]][NUM_IMPORTS] += 1
-                        else:
-                            py_libs[data[MODULE_NAME]] = [1, dict()]
-
+                        # handle from import statement
                         if data[0] == "from":
+                            if data[MODULE_NAME] in py_libs.keys():
+                                py_libs[data[MODULE_NAME]][NUM_IMPORTS] += 1
+                            else:
+                                py_libs[data[MODULE_NAME]] = [1, dict()]
+
                             index = data.index("import") + 1
                             for child in data[index:]:
                                 child_dict = py_libs[data[MODULE_NAME]][CHILD_MODULES]
                                 child_dict[child] = child_dict.get(child, NUM_IMPORTS) + 1
+                        # handle import only statement
+                        if data[0] == "import":
+                            for module_name in data[1:]:
+                                if module_name in py_libs.keys():
+                                    py_libs[module_name][NUM_IMPORTS] += 1
+                                else:
+                                    py_libs[module_name] = [1, dict()]
 
     return py_libs
 
